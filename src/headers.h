@@ -1,25 +1,32 @@
-#ifndef __HEADER_H__
-#define __HEADER_H__
+//
+// Created by nuclearcoder on 07/11/17.
+//
+
+#ifndef SYS_PROJECT_HEADERS_H
+#define SYS_PROJECT_HEADERS_H
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <unistd.h>
+
+#include <string.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 
-#define ERR(cond, name) \
+#define _ERR(cond, name, block) \
     if (cond) {\
         perror(name);\
-        exit(EXIT_FAILURE);\
+        block;\
     }
 
-#define ERRH(cond, name, hook) \
-    if (cond) {\
-        perror(name);\
-        hook\
-        exit(EXIT_FAILURE);\
-    }
+#define ERR(cond, name)         _ERR(cond, name, exit(EXIT_FAILURE))
+#define ERRH(cond, name, hook)  _ERR(cond, name, hook; exit(EXIT_FAILURE))
+#define ERRN(cond, name)        _ERR(cond, name, )
+#define ERRNH(cond, name, hook) _ERR(cond, name, hook)
 
-#endif // __HEADER_H__
+#endif //SYS_PROJECT_HEADERS_H
