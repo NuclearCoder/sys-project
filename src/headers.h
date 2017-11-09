@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <errno.h>
 #include <fcntl.h>
 
 #define _ERR(cond, name, block) \

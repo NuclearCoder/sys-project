@@ -6,6 +6,6 @@
 #define SYS_PROJECT_MISC_H
 
 /* Reads exactly LEN bytes, not less as read(2). Returns -1 on error, 0 on success, 1 on EOF. */
-int exactread(int fd, void *buf, size_t len);
+int exact_read(int fd, void *buf, size_t len);
 
 #endif //SYS_PROJECT_MISC_H

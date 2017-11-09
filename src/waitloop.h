@@ -5,6 +5,6 @@
 #ifndef SYS_PROJECT_WAITLOOP_H
 #define SYS_PROJECT_WAITLOOP_H
 
-void waitloop(const char *pathname);
+void wait_loop(const char *pathname);
 
 #endif //SYS_PROJECT_WAITLOOP_H

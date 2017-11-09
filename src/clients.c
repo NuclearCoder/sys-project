@@ -8,66 +8,55 @@
 #include "misc.h"
 #include "commands.h"
 
-int errcl;
+static int errcl;
 
-#define CLERR_THROW(cond, num) if (cond) { errcl = num; return -1; }
+#define CLERR_THROW(cond, num) if (cond) { errcl = num; return num; }
 
 void perrorcl(void) {
     switch (errcl) {
     case CLERR_NONE:
-        fprintf(stderr, "No error.\n");
+        printf("No error.\n");
         break;
     case CLERR_TERMINATE:
-        fprintf(stderr, "Terminated by client.\n");
+        printf("Terminated by client.\n");
         break;
     case CLERR_READ_FAILED:
-        perror("FIFO read failed");
+        printf("E] FIFO read failed: %s\n", strerror(errno));
         break;
     case CLERR_FIFO_CLOSED:
-        fprintf(stderr, "FIFO closed prematurely.\n");
+        printf("E] FIFO closed prematurely.\n");
         break;
     case CLERR_WRONG_TERM:
-        fprintf(stderr, "Wrong terminating constant.\n");
+        printf("E] Wrong terminating constant.\n");
         break;
     default:
-        fprintf(stderr, "Unknown error: %d\n", errcl);
+        printf("E] Unknown error: %d\n", errcl);
     }
 }
 
 int handle_client(int fd) {
     int r;
 
-    /*
-     * the command ID, an unsigned integer
-     */
-    uint32_t cid;
+    struct packet p;
 
-    // read enough bytes from the fifo
-    r = exactread(fd, &cid, sizeof(cid));
+    r = exact_read(fd, &p, sizeof(p));
     CLERR_THROW(r == -1, CLERR_READ_FAILED)
     CLERR_THROW(r == 1, CLERR_FIFO_CLOSED)
 
-    if (handle_command(cid) == -1) {
-        return -1;
-    }
+    printf("Client: %d\n", p.id);
 
-    uint32_t term;
-    r = exactread(fd, &term, sizeof(term));
-    CLERR_THROW(r == -1, CLERR_READ_FAILED)
-    CLERR_THROW(r == 1, CLERR_FIFO_CLOSED)
-    CLERR_THROW(term == 0xF1F0BEEF, CLERR_WRONG_TERM)
 
-    puts("Received terminating constant.");
+
+    int ret = handle_command(p);
 
     // everything went fine, reset error code and return 0
-    errcl = CLERR_NONE;
-    return 0;
+    return ret;
 }
 
-int handle_command(uint32_t id) {
-    CLERR_THROW(id == CMD_TERMINATE, CLERR_TERMINATE)
+int handle_command(struct packet p) {
+    printf("Received command '%s'.\n", p.data);
 
-    printf("Received command %d.\n", id);
+    CLERR_THROW(strcmp("term", p.data) == 0, CLERR_TERMINATE)
 
     return 0;
 }

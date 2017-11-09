@@ -13,6 +13,5 @@ set(SOURCE_FILES
         src/clients.c src/clients.h
         src/misc.c src/misc.h src/commands.h)
 
-
 add_executable(sys_project ${SOURCE_FILES})
 add_executable(client client/main.c)

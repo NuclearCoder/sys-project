@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
     if (argc > 1) name = argv[1];
     else name = "cmdqueue";
 
-    waitloop(name);
+    wait_loop(name);
 
     return EXIT_SUCCESS;
 }

@@ -10,9 +10,7 @@
 
 static const char *pathname;
 
-static void closehook();
-
-void waitloop(const char *p_pathname) {
+void wait_loop(const char *p_pathname) {
     pathname = p_pathname;
 
     create_pipe(pathname);
@@ -23,32 +21,36 @@ void waitloop(const char *p_pathname) {
     if (pid > 0) {
         // parent process
         int stat;
-        ERR(wait(&stat), "wait")
+        ERR(wait(&stat) == -1, "wait")
+        unlink_pipe(pathname);
         exit(WEXITSTATUS(stat));
     }
 
-    // create hook to unlink the pipe at exit
-    ERRH(atexit(closehook) == -1, "atexit_closehook", unlink_pipe(pathname))
+    /*
+     * The client sends an initiate signal with its PID
+     * (which is a unique ID during a process lifetime).
+     *
+     * Then further communications are done through a SHM
+     * named after the client PID (for uniqueness)
+     */
+
+    int pipe = open_pipe(pathname);
 
     int ret;
     do {
-        int pipe = open_pipe(pathname);
-        // the call will block until the pipe is opened for write
-
-        puts("Client connected.");
-
         ret = handle_client(pipe);
-        if (ret != CLERR_NONE) {
+        if (ret == CLERR_NONE) {
+            // success
+            printf("Success.\n");
+        } else {
             perrorcl();
         }
 
-        close_pipe(pipe);
+        printf("- Client closed.\n");
 
-        puts("Client closed.");
-    } while (ret != CLERR_TERMINATE); //TODO: maybe add a way to close the daemon
+        //usleep(100);
+    } while (ret != CLERR_TERMINATE);
 
-}
+    close_pipe(pipe);
 
-static void closehook() {
-    unlink_pipe(pathname);
 }
