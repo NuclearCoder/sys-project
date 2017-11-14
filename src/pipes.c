@@ -15,7 +15,6 @@ void unlink_pipe(const char *pathname) {
 }
 
 int open_pipe(const char *pathname) {
-    // open in read/write so the pipe stays alive
     int fd = open(pathname, O_RDWR);
     ERR(fd == -1, "open_pipe")
     return fd;

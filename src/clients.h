@@ -13,7 +13,11 @@ enum {
     CLERR_TERMINATE,
     CLERR_READ_FAILED,
     CLERR_FIFO_CLOSED,
-    CLERR_WRONG_TERM
+    CLERR_SHM_OPEN,
+    CLERR_SHM_UNLINK,
+    CLERR_SHM_MMAP,
+    CLERR_SEM_POST,
+    CLERR_THREAD_ARG
 };
 
 #define PACKET_SIZE 1024
@@ -23,10 +27,21 @@ struct packet {
     char data[PACKET_SIZE];
 };
 
+typedef struct {
+    sem_t sem;
+    struct packet p;
+} pmmap_t;
+
 /* Returns 0 on success and returns an error code. */
 int handle_client(int fd);
 
+/* Callback function for thread */
+void *client_thread(void *arg);
+
 /* Returns -1 on error and errcl is set appropriately. */
-int handle_command(struct packet p);
+int handle_command(sem_t *sem, struct packet *response);
+
+/* Sets id and data for a packet; returns the offset in data to write next */
+int pset(struct packet *p, int id, const char *format, ...);
 
 #endif //SYS_PROJECT_CLIENTS_H

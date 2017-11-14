@@ -6,11 +6,11 @@
 
 #include "clients.h"
 #include "misc.h"
-#include "commands.h"
 
 static int errcl;
 
-#define CLERR_THROW(cond, num) if (cond) { errcl = num; return num; }
+#define CLERR_THROW(cond, num)  if (cond) { errcl = num; return num; }
+#define CLERR_THROW2(cond, num) if (cond) { errcl = num; return (void *) num; }
 
 void perrorcl(void) {
     switch (errcl) {
@@ -26,8 +26,20 @@ void perrorcl(void) {
     case CLERR_FIFO_CLOSED:
         printf("E] FIFO closed prematurely.\n");
         break;
-    case CLERR_WRONG_TERM:
-        printf("E] Wrong terminating constant.\n");
+    case CLERR_SHM_OPEN:
+        printf("E] SHM open failed: %s\n", strerror(errno));
+        break;
+    case CLERR_SHM_UNLINK:
+        printf("E] SHM unlink failed: %s\n", strerror(errno));
+        break;
+    case CLERR_SHM_MMAP:
+        printf("E] SHM memory map failed: %s\n", strerror(errno));
+        break;
+    case CLERR_SEM_POST:
+        printf("E] Semaphore post failed: %s\n", strerror(errno));
+        break;
+    case CLERR_THREAD_ARG:
+        printf("E] Could not allocate thread arg: %s\n", strerror(errno));
         break;
     default:
         printf("E] Unknown error: %d\n", errcl);
@@ -35,28 +47,66 @@ void perrorcl(void) {
 }
 
 int handle_client(int fd) {
-    int r;
+    pthread_t th;
+    intptr_t ret;
+
+    pthread_create(&th, NULL, client_thread, (void *) (intptr_t) fd);
+
+    pthread_join(th, (void **) &ret);
+
+    return (int) ret;
+}
+
+void *client_thread(void *arg) {
+    int fd = (int) (intptr_t) arg;
 
     struct packet p;
+    int r = exact_read(fd, &p, sizeof(struct packet));
+    CLERR_THROW2(r == -1, CLERR_READ_FAILED)
+    CLERR_THROW2(r == 1, CLERR_FIFO_CLOSED)
 
-    r = exact_read(fd, &p, sizeof(p));
-    CLERR_THROW(r == -1, CLERR_READ_FAILED)
-    CLERR_THROW(r == 1, CLERR_FIFO_CLOSED)
+    printf(" * Client: %d\n", p.id);
 
-    printf("Client: %d\n", p.id);
+    // create the SHM
+    char name[32];
+    snprintf(name, 32, "/sysp_shm_%d", p.id);
 
+    int shmid = shm_open(name, O_RDWR, 0666);
+    CLERR_THROW2(shmid == -1, CLERR_SHM_OPEN)
 
+    // once we open the SHM on our end, unlink it for our exclusive use
+    CLERR_THROW2(shm_unlink(name) == -1, CLERR_SHM_UNLINK)
 
-    int ret = handle_command(p);
+    // map our variables
+    pmmap_t *map = mmap(NULL, sizeof(pmmap_t),
+                        PROT_READ | PROT_WRITE, MAP_SHARED, shmid, 0);
+    CLERR_THROW2(map == (void *) -1, CLERR_SHM_MMAP)
 
     // everything went fine, reset error code and return 0
+    return (void *) (intptr_t) handle_command(&map->sem, &map->p);
+}
+
+int handle_command(sem_t *sem, struct packet *p) {
+    int ret = CLERR_NONE;
+
+    if (strncmp(p->data, "term", PACKET_SIZE) == 0) {
+        pset(p, 0, "Terminating...");
+    } else {
+        pset(p, 1, "Unknown command.");
+    }
+
+    CLERR_THROW(sem_post(sem) == -1, CLERR_SEM_POST)
+
     return ret;
 }
 
-int handle_command(struct packet p) {
-    printf("Received command '%s'.\n", p.data);
+int pset(struct packet *p, int id, const char *format, ...) {
+    p->id = id;
 
-    CLERR_THROW(strcmp("term", p.data) == 0, CLERR_TERMINATE)
+    va_list argptr;
+    va_start(argptr, format);
+    int n = vsnprintf(p->data, PACKET_SIZE, format, argptr);
+    va_end(argptr);
 
-    return 0;
+    return n;
 }
