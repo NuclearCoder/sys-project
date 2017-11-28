@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -8,6 +9,7 @@
 #include <semaphore.h>
 
 #include "../src/clients.h"
+#include "../src/commands.h"
 
 int main() {
 
@@ -45,8 +47,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    map->p.id = pid;
-    strncpy(map->p.data, "term", PACKET_SIZE);
+    pset(&map->p, pid, NAME(TERMINATE));
 
     write(fd, &map->p, sizeof(struct packet));
     close(fd);
@@ -56,9 +57,21 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    printf("Response: %s", map->p.data);
+    printf("Response: %s\n", map->p.data);
 
     sem_destroy(&map->sem);
 
     return 0;
 }
+
+int pset(struct packet *p, int id, const char *format, ...) {
+    p->id = id;
+
+    va_list argptr;
+    va_start(argptr, format);
+    int n = vsnprintf(p->data, PACKET_SIZE, format, argptr);
+    va_end(argptr);
+
+    return n;
+}
+

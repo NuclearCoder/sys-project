@@ -5,6 +5,7 @@
 #include "headers.h"
 
 #include "clients.h"
+#include "commands.h"
 #include "misc.h"
 
 static int errcl;
@@ -82,31 +83,13 @@ void *client_thread(void *arg) {
                         PROT_READ | PROT_WRITE, MAP_SHARED, shmid, 0);
     CLERR_THROW2(map == (void *) -1, CLERR_SHM_MMAP)
 
-    // everything went fine, reset error code and return 0
-    return (void *) (intptr_t) handle_command(&map->sem, &map->p);
-}
+    // call the command handler
+    intptr_t ret = (intptr_t) handle_command(&map->sem, &map->p);
 
-int handle_command(sem_t *sem, struct packet *p) {
-    int ret = CLERR_NONE;
+    // post the semaphor
+    CLERR_THROW2(sem_post(&map->sem) == -1, CLERR_SEM_POST)
 
-    if (strncmp(p->data, "term", PACKET_SIZE) == 0) {
-        pset(p, 0, "Terminating...");
-    } else {
-        pset(p, 1, "Unknown command.");
-    }
-
-    CLERR_THROW(sem_post(sem) == -1, CLERR_SEM_POST)
-
-    return ret;
-}
-
-int pset(struct packet *p, int id, const char *format, ...) {
-    p->id = id;
-
-    va_list argptr;
-    va_start(argptr, format);
-    int n = vsnprintf(p->data, PACKET_SIZE, format, argptr);
-    va_end(argptr);
-
-    return n;
+    errcl = ret;
+    
+    return (void *) ret;
 }
