@@ -5,9 +5,6 @@
 #ifndef SYS_PROJECT_COMMANDS_H
 #define SYS_PROJECT_COMMANDS_H
 
-int handle_command(sem_t *sem, struct packet *p);
-int pset(struct packet *p, int id, const char *format, ...);
-
 /* need deeper level macro to expand twice */
 
 #define __PC_NAME(c)     #c
@@ -15,9 +12,8 @@ int pset(struct packet *p, int id, const char *format, ...);
 #define NAME(c)          __PC_NAME(c)
 
 #define __PC_DEF(c)      int fndef_##c (struct packet *p)
-#define __PC_IS(c, p)    (strncmp(p->data, NAME(c), PACKET_SIZE) == 0)
+#define __PC_IS(c, p)    (strncmp((p)->data, NAME(c), PACKET_SIZE) == 0)
 #define __PC_CALL(c, p)  fndef_##c (p)
-#define __PC_NAME(c)     #c
 
 /* function definition for a command */
 #define DEFCMD(c)        __PC_DEF(c)

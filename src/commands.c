@@ -7,7 +7,8 @@
 #include "clients.h"
 #include "commands.h"
 
-int handle_command(sem_t *sem, struct packet *p) {
+int handle_command(struct packet *p)
+{
     int ret = CLERR_NONE;
 
     ifcmd(TERMINATE, p) {

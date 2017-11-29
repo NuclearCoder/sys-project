@@ -39,7 +39,7 @@ int handle_client(int fd);
 void *client_thread(void *arg);
 
 /* Returns -1 on error and errcl is set appropriately. */
-int handle_command(sem_t *sem, struct packet *response);
+int handle_command(struct packet *response);
 
 /* Sets id and data for a packet; returns the offset in data to write next */
 int pset(struct packet *p, int id, const char *format, ...);
