@@ -84,12 +84,12 @@ void *client_thread(void *arg) {
     CLERR_THROW2(map == (void *) -1, CLERR_SHM_MMAP)
 
     // call the command handler
-    intptr_t ret = (intptr_t) handle_command(&map->sem, &map->p);
+    intptr_t ret = (intptr_t) handle_command(&map->p);
 
     // post the semaphor
     CLERR_THROW2(sem_post(&map->sem) == -1, CLERR_SEM_POST)
 
-    errcl = ret;
+    errcl = (int) ret;
     
     return (void *) ret;
 }
