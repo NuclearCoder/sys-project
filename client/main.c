@@ -13,8 +13,13 @@ int main(int argc, char **argv) {
     const char *pathname;
     const char *command;
 
-    command = (argc > 2) ? argv[2] : NAME(TERMINATE);
     pathname = (argc > 1) ? argv[1] : "cmdqueue";
+
+    if (argc > 2) {
+        command = argv[2];
+    } else {
+        command = NAME(TERMINATE);
+    }
 
     // pid will identify this process uniquely during its lifetime
     pid_t pid = getpid();

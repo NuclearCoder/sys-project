@@ -21,3 +21,20 @@ int exact_read(int fd, void *buf, size_t len) {
 
     return 0;
 }
+
+bool strsnequ(const char *str1, const char *str2, size_t n) {
+    if (str1 == NULL || str2 == NULL) {
+	    return false;
+    }
+
+    size_t i = 0;
+
+    while (i < n && *str1 != '\0' && *str1 != ' ') {
+	    if (*str1++ != *str2++)
+	        return false;
+        i++;
+    }
+    if (*str2 == '\0' || *str2 == ' ')
+	    return true;
+    return false;
+}

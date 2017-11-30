@@ -12,7 +12,10 @@ set(SERVER_SOURCE_FILES
         src/clients.c    src/clients.h
         src/misc.c       src/misc.h
         src/commands.c   src/commands.h
-        src/cmd_terminate.c)
+        src/perrorcl.c
+        src/cmd_terminate.c
+        src/cmd_info_user.c
+        src/cmd_info_proc.c)
 
 set(CLIENT_SOURCE_FILES
         client/main.c
@@ -27,3 +30,4 @@ target_link_libraries(sys_project rt pthread)
 
 add_executable(client ${CLIENT_SOURCE_FILES})
 target_link_libraries(client rt pthread)
+

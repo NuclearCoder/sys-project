@@ -4,6 +4,7 @@
 
 #include "headers.h"
 
+#include "misc.h"
 #include "clients.h"
 #include "commands.h"
 
@@ -12,6 +13,10 @@ int handle_command(struct packet *p) {
 
     ifcmd(TERMINATE, p) {
         ret = callcmd(TERMINATE, p);
+    } else ifcmd(INFO_USER, p) {
+        ret = callcmd(INFO_USER, p);
+    } else ifcmd(INFO_PROC, p) {
+        ret = callcmd(INFO_PROC, p);
     } else {
         pset(p, -1, "Unknown command: \"%s\"", strdup(p->data));
     }
