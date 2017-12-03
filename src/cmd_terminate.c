@@ -8,6 +8,6 @@
 
 DEFCMD(TERMINATE) {
     pset(p, 0, "Terminating...");
-
+    
     return CLERR_TERMINATE;
 }

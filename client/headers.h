@@ -1,5 +1,5 @@
 //
-// Created by nuclearcoder on 07/11/17.
+// Created by nuclear on 30/11/17.
 //
 
 #ifndef SYS_PROJECT_HEADERS_H
@@ -7,21 +7,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
 #include <unistd.h>
 
 #include <string.h>
-#include <limits.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
 #include <sys/mman.h>
+#include <errno.h>
 #include <semaphore.h>
 #include <pthread.h>
-#include <errno.h>
 #include <fcntl.h>
 
 #define _ERR(cond, name, block) \
@@ -35,4 +30,8 @@
 #define ERRN(cond, name)        _ERR(cond, name, )
 #define ERRNH(cond, name, hook) _ERR(cond, name, hook)
 
-#endif //SYS_PROJECT_HEADERS_H
+
+#include "../src/clients.h"
+#include "../src/commands.h"
+
+#endif // SYS_PROJECT_HEADERS_H

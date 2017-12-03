@@ -4,15 +4,15 @@ cd cmake-build-debug
 cmake ..
 make
 
-rm -f cmdqueue
 killall -qw sys_project
+rm -f cmdqueue
 
-echo "Running ... \n\n"
+echo "-- Running...\n"
 
 ./sys_project &
 sleep 0.05
 
-./client &
+./client "$@" &
 
 wait
 
