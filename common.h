@@ -1,15 +1,15 @@
 //
-// Created by nuclearcoder on 07/11/17.
+// Created by nuclearcoder on 2017-12-03.
 //
 
-#ifndef SYS_PROJECT_HEADERS_H
-#define SYS_PROJECT_HEADERS_H
+#ifndef SYS_PROJECT_COMMON_H
+#define SYS_PROJECT_COMMON_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <string.h>
@@ -35,4 +35,14 @@
 #define ERRN(cond, name)        _ERR(cond, name, )
 #define ERRNH(cond, name, hook) _ERR(cond, name, hook)
 
-#endif //SYS_PROJECT_HEADERS_H
+
+#ifdef DEBUG
+#define __PASTER(X)             #X
+#define pDebugV(str, ...)       printf("[DEBUG " __BASE_FILE__ ":" __PASTER(__LINE__) "] " str "\n", ##__VA_ARGS__)
+#define pDebug(str)             printf("[DEBUG " __BASE_FILE__ ":" __PASTER(__LINE__) "] " str "\n")
+#else
+#define pDebug(str, ...)
+#endif
+
+
+#endif //SYS_PROJECT_COMMON_H

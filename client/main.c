@@ -1,12 +1,10 @@
 //
-// Created by nuclearcoder on 30/11/17
-// 
+// Created by nuclearcoder on 2017-11-30.
+//
 
-#include "headers.h"
+#include "../src/commands.h"
 
-#include "shm.h"
-#include "sem.h"
-#include "fifo.h"
+#include "client.h"
 
 int main(int argc, char **argv) {
     // read pathname and command from argument
@@ -21,24 +19,7 @@ int main(int argc, char **argv) {
         command = NAME(TERMINATE);
     }
 
-    // pid will identify this process uniquely during its lifetime
-    pid_t pid = getpid();
-
-    // create shared memory segment and map it
-    pmmap_t *map = create_and_map_shm(pid);
-    
-    init_sem(map);
-
-    int fd = open_fifo(pathname);
-
-    pset(&map->p, pid, command);
-
-    write(fd, &map->p, sizeof(struct packet));
-    close(fd);
-
-    wait_sem(map);
-
-    printf("Response: %s\n", map->p.data);
+    run_client(pathname, command);
 
     return 0;
 }

@@ -2,7 +2,9 @@
 // Created by nuclearcoder on 30/11/17
 //
 
-#include "headers.h"
+#include "../common.h"
+
+#include "../src/clients.h"
 
 int open_fifo(const char *pathname) {
     int fd = open(pathname, O_WRONLY);
