@@ -28,8 +28,8 @@ set(CLIENT_SOURCE_FILES
         client/client.c client/client.h)
 
 
-add_executable(sys_project ${SERVER_SOURCE_FILES})
-target_link_libraries(sys_project rt pthread)
+add_executable(sys-project ${SERVER_SOURCE_FILES})
+target_link_libraries(sys-project rt pthread)
 
 add_executable(client ${CLIENT_SOURCE_FILES})
 target_link_libraries(client rt pthread)

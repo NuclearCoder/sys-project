@@ -1,22 +1,9 @@
 #!/bin/sh
 
-mkdir build
+mkdir -p build
 cd build
 cmake ..
 make
 
-killall -qw sys_project
+killall -qw sys-project
 rm -f cmdqueue
-
-echo "-- Running...\n"
-
-./sys_project &
-
-./client "$@" &
-
-wait
-
-
-
-
-

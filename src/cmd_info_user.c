@@ -86,7 +86,7 @@ DEFCMD(INFO_USER) {
             "GID:    %d\n"
             "Name:   %s\n"
             "Home:   %s\n"
-            "Shell:  %s",
+            "Shell:  %s\n",
             pwd.pw_name,
             pwd.pw_uid,
             pwd.pw_gid,

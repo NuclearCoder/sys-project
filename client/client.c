@@ -16,7 +16,7 @@ callback(default_callback)
 {
     pDebug("Default callback");
 
-    printf("Return code %d:\n%s\n------------\n", p->id, p->data);
+    printf("* Return code %d:\n%s\n", p->id, p->data);
 
     return (int) p->id;
 }
