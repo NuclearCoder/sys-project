@@ -48,10 +48,13 @@ void *client_thread(void *arg) {
                         PROT_READ | PROT_WRITE, MAP_SHARED, shmid, 0);
     CLERR_THROW2(map == (void *) -1, CLERR_SHM_MMAP)
 
+    
+    pDebugV("Received: \"%s\"", map->p.data);
+
     // call the command handler
     intptr_t ret = (intptr_t) handle_command(&map->p);
 
-    // post the semaphor
+    // post the semaphore
     CLERR_THROW2(sem_post(&map->sem) == -1, CLERR_SEM_POST)
 
     errcl = (int) ret;

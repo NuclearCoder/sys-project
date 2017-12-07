@@ -2,6 +2,8 @@
 // Created by nuclearcoder on 28/11/17.
 //
 
+#include "../common.h"
+
 #include "clients.h"
 #include "commands.h"
 

@@ -6,7 +6,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wconversion -Werror -pedantic
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector-all -D_X_OPEN_SOURCE=700")
 
 # if debug
-add_definitions("-DDEBUG")
+#add_definitions("-DDEBUG")
 
 set(SERVER_SOURCE_FILES
         src/main.c src/perrorcl.c common.h

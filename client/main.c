@@ -2,6 +2,9 @@
 // Created by nuclearcoder on 2017-11-30.
 //
 
+#include "headers.h"
+
+#include "../src/clients.h"
 #include "../src/commands.h"
 
 #include "client.h"

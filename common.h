@@ -23,6 +23,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <pwd.h>
 
 #define _ERR(cond, name, block) \
     if (cond) {\
@@ -38,10 +39,13 @@
 
 #ifdef DEBUG
 #define __PASTER(X)             #X
-#define pDebugV(str, ...)       printf("[DEBUG " __BASE_FILE__ ":" __PASTER(__LINE__) "] " str "\n", ##__VA_ARGS__)
-#define pDebug(str)             printf("[DEBUG " __BASE_FILE__ ":" __PASTER(__LINE__) "] " str "\n")
+#define __RESOLVER(X)           __PASTER(X)
+
+#define pDebugV(str, ...)       printf("[DEBUG " __FILE__ ":" __RESOLVER(__LINE__) "] " str "\n", ##__VA_ARGS__)
+#define pDebug(str)             printf("[DEBUG " __FILE__ ":" __RESOLVER(__LINE__) "] " str "\n")
 #else
-#define pDebug(str, ...)
+#define pDebugV(str, ...)
+#define pDebug(str)
 #endif
 
 

@@ -5,9 +5,9 @@
 #ifndef SYS_PROJECT_CLIENT_H
 #define SYS_PROJECT_CLIENT_H
 
-typedef int (*ccallback_t)(pmmap_t *);
+typedef int (*ccallback_t)(struct packet *);
 
-#define callback(name) int name (pmmap_t *map)
+#define callback(name) int name (struct packet *p)
 
 void set_callback(ccallback_t cb);
 

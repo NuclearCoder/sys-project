@@ -11,4 +11,7 @@ int exact_read(int fd, void *buf, size_t len);
 /* Compares two strings until a space character is found (null-terminated)  */
 bool strsnequ(const char *s1, const char *s2, size_t n);
 
+/* Parses an integer from a string. Returns -1 on error, 0 on success, 1 if not an integer. */
+int parseint(const char *str, int *nptr);
+
 #endif //SYS_PROJECT_MISC_H

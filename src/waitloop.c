@@ -21,6 +21,10 @@ void wait_loop(const char *p_pathname) {
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
     action.sa_handler = term;
+    sigset_t set;
+    sigfillset(&set);
+    sigdelset(&set, SIGTERM);
+    action.sa_mask = set;
     sigaction(SIGTERM, &action, NULL);
 
     /*
@@ -45,6 +49,8 @@ void wait_loop(const char *p_pathname) {
     } while (ret != CLERR_TERMINATE);
 
     close_pipe(pipe);
+
+    raise(SIGTERM);
 
 }
 

@@ -43,6 +43,9 @@ void perrorcl(void) {
     case CLERR_PARSE_NOTHING:
         printf("E] Could not find anything to parse.\n");
         break;
+    case CLERR_USER_FAILED:
+        printf("E] No such user found.\n");
+        break;
     case CLERR_NO_INFO:
         printf("E] Could not fetch information.\n");
         break;

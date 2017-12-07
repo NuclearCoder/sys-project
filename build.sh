@@ -1,6 +1,7 @@
 #!/bin/sh
 
-cd cmake-build-debug
+mkdir build
+cd build
 cmake ..
 make
 
@@ -10,7 +11,6 @@ rm -f cmdqueue
 echo "-- Running...\n"
 
 ./sys_project &
-sleep 0.05
 
 ./client "$@" &
 

@@ -38,3 +38,23 @@ bool strsnequ(const char *str1, const char *str2, size_t n) {
 	    return true;
     return false;
 }
+
+int parseint(const char *str, int *nptr) {
+    char *endptr;
+    long val;
+
+    errno = 0;
+    val = strtol(str, &endptr, 0);
+
+    if ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))
+            || (errno != 0 && val == 0)) {
+        return -1;
+    } else if (endptr == str || *endptr != '\0') {
+        // parse only a full integer (greedy parse)
+        return 1;
+    }
+
+    *nptr = (int) val;
+
+    return 0;
+}

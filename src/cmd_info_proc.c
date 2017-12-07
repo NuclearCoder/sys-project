@@ -6,6 +6,7 @@
 
 #include "clients.h"
 #include "commands.h"
+#include "misc.h"
 
 #define PROC_LINE_MAX 128
 
@@ -15,8 +16,9 @@ DEFCMD(INFO_PROC) {
      * the process ID of which to return information.
      */
 
-    long val = 0;
-    char *endptr;
+    char *sstr;
+    pid_t pid;
+    int s;
 
     // strtol requires a null-terminated string,
     // so add it for safety measures
@@ -24,36 +26,31 @@ DEFCMD(INFO_PROC) {
     p->data[PACKET_SIZE - 1] = '\0';
 
     // skip the command name (space)
-    char *sstr = p->data + strlen(NAME(TERMINATE)) + 1;
-
-    errno = 0;
-    val = strtol(sstr, &endptr, 0);
-
-    // check if parse went well
-    if ((errno = ERANGE && (val == LONG_MAX || val == LONG_MIN))
-            || (errno != 0 && val == 0)) {
-        pset(p, 1, "Error: parsing integer failed");
+    sstr = p->data + strlen(NAME(TERMINATE)) + 1;
+    
+    s = parseint(sstr, &pid);
+    if (s == -1) {
+        pset(p, -1, "Error: parsing integer failed");
         return CLERR_PARSE_RANGE;
-    } else if (endptr == p->data) {
-        pset(p, 1, "Error: no integer was found to parse");
+    } else if (s == 1) {
+        pset(p, -1, "Error: no integer was found to parse");
         return CLERR_PARSE_NOTHING;
     }
 
-    // here, it means it is an integer
-    pid_t pid = (pid_t) val;
-
     // fetch answer and write it to packet
-    size_t len = PROC_LINE_MAX;
-
-    char *buf = calloc(len, sizeof(char));
+    char *buf;
+    size_t len;
     ssize_t read;
     FILE *f; // use FILE for getline
+    
+    len = PROC_LINE_MAX;
+    buf = malloc(len);
 
     // write the /proc/status filename
     snprintf(buf, len, "/proc/%d/status", pid);
     f = fopen(buf, "r");
     if (f == NULL) {
-        pset(p, 1, "Error: could not read process information");
+        pset(p, -1, "Error: could not read process information");
         free(buf);
         return CLERR_NO_INFO;
     }
