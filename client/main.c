@@ -27,6 +27,7 @@ int main(int argc, char **argv) {
         char *command = calloc(CMD_LINE_MAX, sizeof(char));
         size_t size = CMD_LINE_MAX;
         ssize_t n;
+
         do {
             putchar('>');
             putchar(' ');
@@ -41,6 +42,8 @@ int main(int argc, char **argv) {
 
             run_client(pathname, command);
         } while (*command != ' ' && *command != '\n' && *command != '\0');
+
+        free(command);
     }
 
     return 0;
