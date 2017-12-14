@@ -8,6 +8,8 @@
 #include "commands.h"
 
 DEFCMD(TERMINATE) {
+    (void) sem;
+
     pset(p, 0, "Terminating...");
     
     return CLERR_TERMINATE;

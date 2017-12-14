@@ -8,17 +8,17 @@
 #include "clients.h"
 #include "commands.h"
 
-int handle_command(struct packet *p) {
+int handle_command(pmmap_t *map) {
     int ret = CLERR_NONE;
 
-    ifcmd(TERMINATE, p) {
-        ret = callcmd(TERMINATE, p);
-    } else ifcmd(INFO_USER, p) {
-        ret = callcmd(INFO_USER, p);
-    } else ifcmd(INFO_PROC, p) {
-        ret = callcmd(INFO_PROC, p);
+    ifcmd(TERMINATE, map) {
+        ret = callcmd(TERMINATE, map);
+    } else ifcmd(INFO_USER, map) {
+        ret = callcmd(INFO_USER, map);
+    } else ifcmd(INFO_PROC, map) {
+        ret = callcmd(INFO_PROC, map);
     } else {
-        pset(p, -1, "Unknown command: \"%s\"", strdup(p->data));
+        pset(&map->p, -1, "Unknown command: \"%s\"", strdup(map->p.data));
     }
 
     return ret;
@@ -33,4 +33,17 @@ int pset(struct packet *p, int id, const char *format, ...) {
     va_end(argptr);
 
     return n;
+}
+
+int increpif(struct packet *p, sem_t *sem, bool cond) {
+    if (!cond) return 0;
+
+    p->id = 2;
+    if (sem_wait(sem) == -1) {
+        return -1;
+    }
+
+    p->data[0] = '\0';
+
+    return 0;
 }

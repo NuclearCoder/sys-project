@@ -65,8 +65,14 @@ DEFCMD(INFO_PROC) {
             // break without return, don't discard what we already wrote
             break;
         }
+
+        size_t spaceleft = PACKET_SIZE - strlen(p->data) - 1;
+
+        // if there is not enough space left to write the line, write and wait
+        increpif(p, sem, spaceleft);
+
         // concat to the packet data
-        strncat(p->data, buf, PACKET_SIZE - strlen(p->data) - 1);
+        strncat(p->data, buf, spaceleft);
     }
     
     fclose(f);

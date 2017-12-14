@@ -46,11 +46,11 @@ int main(int argc, char **argv) {
         case 0: // child process
             break;
         default: // parent process
-            printf("Running in daemon mode - process will run in background.");
+            printf("Running in daemon mode - process will run in background.\n");
             return EXIT_SUCCESS;
         }
     } else {
-        printf("Running in normal mode - process will run in foreground.");
+        printf("Running in normal mode - process will run in foreground.\n");
     }
     
     // if silent_flag is set to true, redirect stdout to /dev/null

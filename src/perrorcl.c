@@ -31,6 +31,9 @@ void perrorcl(void) {
     case CLERR_SHM_MMAP:
         printf("E] SHM memory map failed: %s\n", strerror(errno));
         break;
+    case CLERR_SEM_WAIT:
+        printf("E] Semaphore wait failed: %s\n", strerror(errno));
+        break;
     case CLERR_SEM_POST:
         printf("E] Semaphore post failed: %s\n", strerror(errno));
         break;

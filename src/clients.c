@@ -32,6 +32,9 @@ int handle_client(int fd) {
 }
 
 void *client_thread(void *arg) {
+    int *ret = malloc(sizeof(int));
+    CLERR_THROW2(ret == NULL, CLERR_OUT_OF_HEAP)
+
     int fd = *((int *) arg);
     free(arg);
 
@@ -61,10 +64,7 @@ void *client_thread(void *arg) {
     pDebugV("Received: \"%s\"", map->p.data);
 
     // call the command handler
-    int *ret = malloc(sizeof(int));
-    CLERR_THROW2(ret == NULL, CLERR_OUT_OF_HEAP)
-
-    errcl = *ret = handle_command(&map->p);
+    errcl = *ret = handle_command(map);
 
     // post the semaphore
     CLERR_THROW2(sem_post(&map->sem) == -1, CLERR_SEM_POST)

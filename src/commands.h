@@ -7,9 +7,9 @@
 
 /* need deeper level macro to expand twice */
 
-#define __PC_DEF(c)      int fndef_##c (struct packet *p)
-#define __PC_IS(c, p)    (strsnequ((p)->data, NAME(c), PACKET_SIZE) == true)
-#define __PC_CALL(c, p)  fndef_##c (p)
+#define __PC_DEF(c)      int fndef_##c (struct packet *p, sem_t *sem)
+#define __PC_IS(c, map)    (strsnequ((map)->p.data, NAME(c), PACKET_SIZE) == true)
+#define __PC_CALL(c, map)  fndef_##c (&(map)->p, &(map)->sem)
 #define __PC_NAME(c)     #c
 
 /* the string name of a command */
@@ -19,14 +19,14 @@
 #define DEFCMD(c)        __PC_DEF(c)
 
 /* boolean expression to test if a packet corresponds to a command */
-#define iscmd(c, p)      __PC_IS(c, p)
+#define iscmd(c, map)      __PC_IS(c, map)
 /* shorthand for if (iscmd), can be chained like regular if */
-#define ifcmd(c, p)      if (iscmd(c, p))
+#define ifcmd(c, map)      if (iscmd(c, map))
 
 /* call site for a command function */
-#define callcmd(c, p)    __PC_CALL(c, p)
+#define callcmd(c, map)    __PC_CALL(c, map)
 /* shorthand for ifcmd callcmd, can be chained like regular if */
-#define callcmdif(c, p)  ifcmd(c, p) callcmd(c, p)
+#define callcmdif(c, map)  ifcmd(c, map) callcmd(c, map)
 
 
 // commands:

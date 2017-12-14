@@ -16,7 +16,12 @@ callback(default_callback)
 {
     pDebug("Default callback");
 
-    printf("* Return code %d:\n%s\n", p->id, p->data);
+    pDebugV("Return code: %d", p->id);
+    pDebugV("");
+
+    if (p->id == 2) { // if response is incomplete
+
+    }
 
     return (int) p->id;
 }
@@ -64,7 +69,7 @@ void run_client(const char *fifoname, const char *command, ...)
 
     pDebugV("Response: \"%s\"", map->p.data);
 
-    int ret = s_cb(&map->p);
+    int ret = s_cb(&map->p, &map->sem);
 
     (void) ret;
 

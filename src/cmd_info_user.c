@@ -78,23 +78,32 @@ DEFCMD(INFO_USER) {
 
     // from this point, pwd contains a valid passwd struct
 
+    // set maximum lengths of each line, for overflow checking
+    size_t lengths[6] = {
+        10 + strlen(pwd.pw_name),
+        20,
+        20,
+        10 + strlen(pwd.pw_gecos),
+        10 + strlen(pwd.pw_dir),
+        10 + strlen(pwd.pw_shell)
+    };
+
+    // reset data
     p->data[0] = '\0';
 
-    snprintf(p->data, PACKET_SIZE,
-            "User:   %s\n"
-            "UID:    %d\n"
-            "GID:    %d\n"
-            "Name:   %s\n"
-            "Home:   %s\n"
-            "Shell:  %s\n",
-            pwd.pw_name,
-            pwd.pw_uid,
-            pwd.pw_gid,
-            pwd.pw_gecos,
-            pwd.pw_dir,
-            pwd.pw_shell
-    );
+#define writeline(i, str, arg) \
+    do { \
+        snprintf(p->data, PACKET_SIZE, str, arg); \
+        increpif(p, sem, strlen(p->data) + lengths[i] <= PACKET_SIZE); \
+    } while (true);
 
+    writeline(0, "User:   %s\n", pwd.pw_name);
+    writeline(1, "UID:    %d\n", pwd.pw_uid);
+    writeline(2, "GID:    %d\n", pwd.pw_gid);
+    writeline(3, "Name:   %s\n", pwd.pw_gecos);
+    writeline(4, "Home:   %s\n", pwd.pw_dir);
+    writeline(5, "Shell:  %s\n", pwd.pw_shell);
+    
     free(buf);
 
     p->id = 0;

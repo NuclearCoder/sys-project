@@ -16,6 +16,7 @@ enum {
     CLERR_SHM_OPEN,
     CLERR_SHM_UNLINK,
     CLERR_SHM_MMAP,
+    CLERR_SEM_WAIT,
     CLERR_SEM_POST,
     CLERR_THREAD_ARG,
     CLERR_PARSE_RANGE,
@@ -44,9 +45,12 @@ int handle_client(int fd);
 void *client_thread(void *arg);
 
 /* Returns -1 on error and errcl is set appropriately. */
-int handle_command(struct packet *response);
+int handle_command(pmmap_t *map);
 
 /* Sets id and data for a packet; returns the offset in data to write next */
 int pset(struct packet *p, int id, const char *format, ...);
+
+/* Sends an incomplete response and resets data, returns -1 on error */
+int increpif(struct packet *p, sem_t *sem, bool cond);
 
 #endif //SYS_PROJECT_CLIENTS_H
