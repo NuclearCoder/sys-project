@@ -10,21 +10,30 @@
 extern int errcl;
 
 #define CLERR_THROW(cond, num)  if (cond) { errcl = num; return num; }
-#define CLERR_THROW2(cond, num) if (cond) { errcl = num; return (void *) num; }
+#define CLERR_THROW2(cond, num) if (cond) { errcl = num; *ret = num; return ret; }
 
 int handle_client(int fd) {
     pthread_t th;
-    intptr_t ret;
+    int *arg, *ret;
+    int retval;
 
-    pthread_create(&th, NULL, client_thread, (void *) (intptr_t) fd);
+    arg = malloc(sizeof(int));
+    CLERR_THROW(arg == NULL, CLERR_OUT_OF_HEAP)
+    
+    *arg = fd;
 
+    pthread_create(&th, NULL, client_thread, arg);
     pthread_join(th, (void **) &ret);
 
-    return (int) ret;
+    retval = *ret;
+    free(ret);
+
+    return retval;
 }
 
 void *client_thread(void *arg) {
-    int fd = (int) (intptr_t) arg;
+    int fd = *((int *) arg);
+    free(arg);
 
     struct packet p;
     int r = exact_read(fd, &p, sizeof(struct packet));
@@ -52,12 +61,13 @@ void *client_thread(void *arg) {
     pDebugV("Received: \"%s\"", map->p.data);
 
     // call the command handler
-    intptr_t ret = (intptr_t) handle_command(&map->p);
+    int *ret = malloc(sizeof(int));
+    CLERR_THROW2(ret == NULL, CLERR_OUT_OF_HEAP)
+
+    errcl = *ret = handle_command(&map->p);
 
     // post the semaphore
     CLERR_THROW2(sem_post(&map->sem) == -1, CLERR_SEM_POST)
-
-    errcl = (int) ret;
     
     return (void *) ret;
 }

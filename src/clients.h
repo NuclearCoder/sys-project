@@ -21,10 +21,11 @@ enum {
     CLERR_PARSE_RANGE,
     CLERR_PARSE_NOTHING,
     CLERR_USER_FAILED,
+    CLERR_OUT_OF_HEAP,
     CLERR_NO_INFO
 };
 
-#define PACKET_SIZE 1024
+#define PACKET_SIZE 32
 
 struct packet {
     int id;

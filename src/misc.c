@@ -13,7 +13,15 @@ int exact_read(int fd, void *buf, size_t len) {
     count = 0;
     while (count != len) {
         br = read(fd, (char *) buf + count, len - count);
-        if (br == -1) return -1;
+        if (br == -1) {
+            // if it's an interrupt, just restart the call
+            if (errno == EINTR) {
+                count = 0;
+                continue;
+            } else {
+                return -1;
+            }
+        }
         else if (br == 0) return 1;
 
         count += (size_t) br;

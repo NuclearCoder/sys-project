@@ -49,6 +49,8 @@ void perrorcl(void) {
     case CLERR_NO_INFO:
         printf("E] Could not fetch information.\n");
         break;
+    case CLERR_OUT_OF_HEAP:
+        printf("E] Could not allocate on the heap.\n");
     default:
         printf("E] Unknown error: %d\n", errcl);
     }
